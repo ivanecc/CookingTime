@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Cooking Time</string>
+    <string name="nav_ingredients">By ingredients</string>
+    <string name="nav_name">By name</string>
+    <string name="nav_group">By group</string>
+    <string name="openDrawer">Navigation View Closed</string>
+    <string name="closeDrawer">Navigation View</string>
+</resources>
