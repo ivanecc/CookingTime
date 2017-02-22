@@ -36,19 +36,19 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
 
         setSupportActionBar(toolbar);
 
-        actionBarDrawerToggle =
-                new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
-                    @Override
-                    public void onDrawerClosed(View drawerView) {
-                        super.onDrawerClosed(drawerView);
-                        navigationView.getMenu().findItem(R.id.navGroup).setVisible(false);
-                    }
+        initNavigationView();
 
-                    @Override
-                    public void onDrawerOpened(View drawerView) {
-                        super.onDrawerOpened(drawerView);
-                    }
-                };
+    }
+
+    private void initNavigationView() {
+        navigationView.getMenu().findItem(R.id.navName).setVisible(false);
+
+        actionBarDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.openDrawer,
+                R.string.closeDrawer);
         actionBarDrawerToggle.syncState();
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
 
@@ -59,18 +59,38 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                 drawerLayout.closeDrawers();
                 switch (item.getItemId()) {
                     case R.id.navName:
+                        setHideNamePoint();
                         //open name
                         return true;
                     case R.id.navIngredients:
+                        setHideIngredPoint();
 
                         return true;
                     case R.id.navGroup:
-
+                        setHideGroupPoint();
                         return true;
                 }
                 return true;
             }
         });
+    }
+
+    private void setHideGroupPoint() {
+        navigationView.getMenu().findItem(R.id.navGroup).setVisible(false);
+        navigationView.getMenu().findItem(R.id.navIngredients).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navName).setVisible(true);
+    }
+
+    private void setHideIngredPoint() {
+        navigationView.getMenu().findItem(R.id.navIngredients).setVisible(false);
+        navigationView.getMenu().findItem(R.id.navGroup).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navName).setVisible(true);
+    }
+
+    private void setHideNamePoint() {
+        navigationView.getMenu().findItem(R.id.navName).setVisible(false);
+        navigationView.getMenu().findItem(R.id.navGroup).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navIngredients).setVisible(true);
     }
 
     @Override
