@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.fragments.SearchNameFragment;
+import com.anna.cookingtime.fragments.dish.DishFragment;
 import com.anna.cookingtime.interfaces.FragmentRequestListener;
 
 import butterknife.BindView;
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
 
         initNavigationView();
 
+        startSearchNameFragment();
+
     }
 
     private void initNavigationView() {
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                 switch (item.getItemId()) {
                     case R.id.navName:
                         setHideNamePoint();
-                        //open name
+                        startSearchNameFragment();
                         return true;
                     case R.id.navIngredients:
                         setHideIngredPoint();
@@ -112,6 +116,23 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
 
     @Override
     public void startSearchNameFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content,
+                        new SearchNameFragment(),
+                        SearchNameFragment.TAG)
+                .addToBackStack(SearchNameFragment.TAG)
+                .commit();
+    }
 
+    @Override
+    public void startDish(long id) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content,
+                        DishFragment.newInstance(id),
+                        DishFragment.TAG)
+                .addToBackStack(DishFragment.TAG)
+                .commit();
     }
 }

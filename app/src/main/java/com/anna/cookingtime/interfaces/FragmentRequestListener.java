@@ -6,4 +6,5 @@ package com.anna.cookingtime.interfaces;
 
 public interface FragmentRequestListener {
     void startSearchNameFragment();
+    void startDish(long id);
 }

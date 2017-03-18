@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="star">
+
+        <item>100,0,100,52,</item>
+        <item>143,10,121,56,</item>
+        <item>178,37,137,69,</item>
+        <item>197,77,147,89,</item>
+        <item>197,122,147,110,</item>
+        <item>178,162,137,130,</item>
+        <item>143,190,120,143,</item>
+        <item>100,200,100,148,</item>
+        <item>57,190,79,143,</item>
+        <item>22,162,62,130,</item>
+        <item>2,122,53,111,</item>
+        <item>2,78,53,89,</item>
+        <item>22,37,62,70,</item>
+        <item>56,10,79,56,</item>
+
+    </string-array>
+
+    <integer-array name="swipe_colors">
+        <item>@color/colorPrimary</item>
+        <item>@color/colorPrimaryDark</item>
+    </integer-array>
+
+</resources>

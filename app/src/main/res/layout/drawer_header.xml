@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/drawer_header_height"
     android:padding="@dimen/fifteen_dp"
-    android:background="@drawable/drawer_header_background"
+    android:background="@color/colorPrimaryDark"
     android:gravity="bottom"
     android:orientation="vertical">
 
@@ -14,6 +14,7 @@
         android:src="@mipmap/ic_launcher" />
 
     <TextView
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/twenty_sp"

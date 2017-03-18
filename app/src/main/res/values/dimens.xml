@@ -7,4 +7,9 @@
     <dimen name="twenty_dp">20dp</dimen>
     <dimen name="twenty_sp">20sp</dimen>
     <dimen name="five_dp">5dp</dimen>
+    <dimen name="one_hundred_fivty_dp">150dp</dimen>
+    <dimen name="forty_dp">40dp</dimen>
+    <dimen name="ten_dp">10dp</dimen>
+    <dimen name="four_dp">4dp</dimen>
+    <dimen name="fivteen_dp">15dp</dimen>
 </resources>

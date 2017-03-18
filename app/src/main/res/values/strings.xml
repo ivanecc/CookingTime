@@ -5,4 +5,6 @@
     <string name="nav_group">By group</string>
     <string name="openDrawer">Navigation View Closed</string>
     <string name="closeDrawer">Navigation View</string>
+    <string name="recipe">RECIPE</string>
+    <string name="ingredients">INGREDIENTS</string>
 </resources>
