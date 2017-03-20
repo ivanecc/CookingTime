@@ -6,6 +6,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -135,6 +138,17 @@ public class DishFragment extends BaseFragment {
 
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+    }
+
     private void getDish(long id) {
         getCalls().getDish(id).enqueue(new Callback<Dish>() {
             @Override
@@ -184,5 +198,4 @@ public class DishFragment extends BaseFragment {
     interface RefreshData {
         void onRefresh(Dish dish);
     }
-
 }

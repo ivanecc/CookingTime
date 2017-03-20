@@ -6,6 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -36,6 +39,11 @@ public class SearchNameFragment extends BaseFragment {
     public static final String TAG = "SearchName";
     private static final byte DISHES_LIMIT = 15;
 
+    private final String DIFFICULTY_LEVEL = "difficulty_level";
+    private final String NAME = "name";
+    private final String COOCKING_TIME = "cooking_time";
+    private final String CALORIES = "calories";
+
     @BindView(R.id.dishesRecycler)
     RecyclerView dishesRecycler;
     @BindView(R.id.swipeToRefreshLayout)
@@ -45,6 +53,7 @@ public class SearchNameFragment extends BaseFragment {
     private byte page = 1;
     private byte nextPage = 1;
     private DishRecyclerViewAdapter dishAdapter;
+    private String value = NAME;
 
     @Nullable
     @Override
@@ -182,7 +191,7 @@ public class SearchNameFragment extends BaseFragment {
     }
 
     private void getDishes() {
-        getCalls().getAllDish(page).enqueue(new Callback<BaseArrayModel<Dish>>() {
+        getCalls().getAllDish(page, value).enqueue(new Callback<BaseArrayModel<Dish>>() {
             @Override
             public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -222,7 +231,39 @@ public class SearchNameFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sortByName:
+                value = NAME;
+                getDishes();
+                return true;
+            case R.id.sortByCalories:
+                value = CALORIES;
+                getDishes();
+                return true;
+            case R.id.sortByCooking_time:
+                value = COOCKING_TIME;
+                getDishes();
+                return true;
+            case R.id.sortByDifficulty_level:
+                value = DIFFICULTY_LEVEL;
+                getDishes();
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

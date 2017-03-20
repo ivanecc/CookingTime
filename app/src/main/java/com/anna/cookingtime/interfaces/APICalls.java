@@ -10,10 +10,10 @@ import retrofit2.http.Query;
 
 public interface APICalls {
 
-    @GET("dishes.json")
-    Call<BaseArrayModel<Dish>> getAllDish(@Query("page") int page);
+    @GET("dishes")
+    Call<BaseArrayModel<Dish>> getAllDish(@Query("page") int page, @Query("order_by") String value);
 
-    @GET("dishes/{dishId}.json")
+    @GET("dishes/{dishId}")
     Call<Dish> getDish(@Path("dishId") long dishId);
 
 }

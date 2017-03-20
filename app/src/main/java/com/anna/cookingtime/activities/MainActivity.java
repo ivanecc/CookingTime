@@ -8,6 +8,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -96,6 +98,11 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
         navigationView.getMenu().findItem(R.id.navName).setVisible(false);
         navigationView.getMenu().findItem(R.id.navGroup).setVisible(true);
         navigationView.getMenu().findItem(R.id.navIngredients).setVisible(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
     }
 
     @Override

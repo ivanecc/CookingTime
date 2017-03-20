@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sortByName"
+        android:title="By name" />
+    <item android:id="@+id/sortByCalories"
+        android:title="By calories" />
+    <item android:id="@+id/sortByCooking_time"
+        android:title="By cooking_time" />
+    <item android:id="@+id/sortByDifficulty_level"
+        android:title="By difficulty level" />
+</menu>
