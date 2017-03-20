@@ -3,6 +3,7 @@ package com.anna.cookingtime.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
+import com.anna.cookingtime.fragments.dish.IngredientsFragment;
 import com.anna.cookingtime.fragments.dish.RecipeFragment;
 import com.anna.cookingtime.utils.Constants;
 import com.anna.cookingtime.utils.Utils;
@@ -24,7 +25,7 @@ public class DishViewPagerAdapter extends SmartFragmentStatePagerAdapter {
             case Constants.RECIPE:
                 return new RecipeFragment();
             case Constants.INGREDIENTS:
-//                return SearchParentFragment.newInstance();
+                return new IngredientsFragment();
             default:
 //                return new FeedFragment();
         }

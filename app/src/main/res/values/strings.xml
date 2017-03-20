@@ -7,4 +7,7 @@
     <string name="closeDrawer">Navigation View</string>
     <string name="recipe">RECIPE</string>
     <string name="ingredients">INGREDIENTS</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
 </resources>

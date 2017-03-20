@@ -72,4 +72,12 @@ public class Dish implements Serializable {
     public void setIngredients(List<Ingredients> ingredients) {
         this.ingredients = ingredients;
     }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
 }

@@ -15,6 +15,7 @@ import com.anna.cookingtime.R;
 import com.anna.cookingtime.fragments.SearchNameFragment;
 import com.anna.cookingtime.fragments.dish.DishFragment;
 import com.anna.cookingtime.interfaces.FragmentRequestListener;
+import com.anna.cookingtime.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -111,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            if (Utils.isRootFragment()) {
+                setTitle(R.string.app_name);
+            }
         }
     }
 
@@ -121,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                 .add(R.id.content,
                         new SearchNameFragment(),
                         SearchNameFragment.TAG)
-                .addToBackStack(SearchNameFragment.TAG)
                 .commit();
     }
 
@@ -135,4 +138,5 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                 .addToBackStack(DishFragment.TAG)
                 .commit();
     }
+
 }

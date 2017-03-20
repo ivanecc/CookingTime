@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="@dimen/five_dp">
+
+    <TextView
+        android:id="@+id/nameIngredient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/countContainer"
+        android:textSize="@dimen/twenty_sp"
+        tool:text="Kakaska" />
+
+    <LinearLayout
+        android:id="@+id/countContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true">
+
+        <TextView
+            android:id="@+id/quantityIngredient"
+            android:layout_gravity="bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/twenty_sp"
+            tool:text="400" />
+
+        <TextView
+            android:id="@+id/unitIngredient"
+            android:layout_width="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/two_dp"
+            tool:text="tablespoon" />
+
+    </LinearLayout>
+
+</RelativeLayout>

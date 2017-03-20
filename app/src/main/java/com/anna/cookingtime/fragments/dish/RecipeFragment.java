@@ -5,12 +5,10 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.anna.cookingtime.R;
 import com.anna.cookingtime.fragments.BaseFragment;
-import com.anna.cookingtime.models.BaseArrayModel;
 import com.anna.cookingtime.models.Dish;
 
 import butterknife.BindView;
@@ -23,7 +21,7 @@ import retrofit2.Response;
  * Created by iva on 18.03.17.
  */
 
-public class RecipeFragment extends BaseFragment {
+public class RecipeFragment extends BaseFragment implements DishFragment.RefreshData {
     private static final String TAG = "RecipeFragment";
 
     @BindView(R.id.recipe)
@@ -43,32 +41,21 @@ public class RecipeFragment extends BaseFragment {
 
         ButterKnife.bind(this, root);
 
+        ((DishFragment) getParentFragment()).setDetailsListener(RecipeFragment.this);
+
         return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getDish(((DishFragment)getParentFragment()).dishId);
+        if (((DishFragment)getParentFragment()).dish != null) {
+            recipe.setText(((DishFragment) getParentFragment()).dish.getInstructions());
+        }
     }
 
-    private void getDish(long dishId) {
-        getCalls().getDish(dishId).enqueue(new Callback<Dish>() {
-            @Override
-            public void onResponse(Call<Dish> call, Response<Dish> response) {
-                Dish dish = response.body();
-                if (dish != null) {
-                    recipe.setText(dish.getInstructions());
-                    ((DishFragment)getParentFragment()).dishPhoto.loadImage(
-                            dish.getImageUrl(),
-                            ((DishFragment)getParentFragment()).dishProgressBar);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Dish> call, Throwable t) {
-
-            }
-        });
+    @Override
+    public void onRefresh(Dish dish) {
+        recipe.setText(dish.getInstructions());
     }
 }
