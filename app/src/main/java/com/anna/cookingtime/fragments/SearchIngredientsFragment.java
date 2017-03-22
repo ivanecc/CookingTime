@@ -7,18 +7,20 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
-import com.anna.cookingtime.adapters.DishRecyclerViewAdapter;
+import com.anna.cookingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
-import com.anna.cookingtime.models.Dish;
+import com.anna.cookingtime.models.CategoriesModel;
+import com.anna.cookingtime.models.Category;
+import com.anna.cookingtime.models.Ingredients;
+import com.anna.cookingtime.views.RecycleViewItemDecoration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -35,25 +37,19 @@ import retrofit2.Response;
  * Created by iva on 18.02.17.
  */
 
-public class SearchNameFragment extends BaseFragment {
-    public static final String TAG = "SearchName";
-    private static final byte DISHES_LIMIT = 15;
-
-    private final String DIFFICULTY_LEVEL = "difficulty_level";
-    private final String NAME = "name";
-    private final String COOCKING_TIME = "cooking_time";
-    private final String CALORIES = "calories";
+public class SearchIngredientsFragment extends BaseFragment {
+    public static final String TAG = "SearchIngredients";
+    private static final byte INGREDIENTS_LIMIT = 15;
 
     @BindView(R.id.dishesRecycler)
-    RecyclerView dishesRecycler;
+    RecyclerView categoryRecycler;
     @BindView(R.id.swipeToRefreshLayout)
     PtrFrameLayout swipeToRefreshLayout;
 
-    private List<Dish> dishList;
+    private List<Ingredients> ingredientsList;
     private byte page = 1;
     private byte nextPage = 1;
-    private DishRecyclerViewAdapter dishAdapter;
-    private String value = NAME;
+    private IngredientsRecyclerViewAdapter ingredientsAdapter;
 
     @Nullable
     @Override
@@ -76,9 +72,9 @@ public class SearchNameFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        List<Dish> dishList = (List<Dish>) cacheManager.getObjectFromCache(TAG);
-        if (dishList != null) {
-            initRecyclerView(dishList);
+        List<Ingredients> ingredientsList = (List<Ingredients>) cacheManager.getObjectFromCache(TAG);
+        if (ingredientsList != null) {
+            initRecyclerView(ingredientsList);
         }
 
         initSwipeToRefresh();
@@ -120,58 +116,58 @@ public class SearchNameFragment extends BaseFragment {
 
             @Override
             public void onRefreshBegin(final PtrFrameLayout frame) {
-                getDishes();
+                getIngredients();
             }
         });
     }
 
-    private void initRecyclerView(List<Dish> dishList) {
-        if (dishList != null) {
-            this.dishList = dishList;
-            if (dishAdapter != null && dishesRecycler.getAdapter() != null) {
-                dishAdapter.setNewData(dishList);
+    private void initRecyclerView(List<Ingredients> ingredientsList) {
+        if (ingredientsList != null) {
+            this.ingredientsList = ingredientsList;
+            if (ingredientsAdapter != null && categoryRecycler.getAdapter() != null) {
+                ingredientsAdapter.setNewData(ingredientsList);
             } else {
-                dishAdapter = new DishRecyclerViewAdapter(
-                        dishList,
-                        requestListener,
-                        getCalls()
+                ingredientsAdapter = new IngredientsRecyclerViewAdapter(
+                        ingredientsList,
+                        new ArrayList<Long>()
                 );
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(
+                LinearLayoutManager mLayoutManager = new LinearLayoutManager(
                         CookingTimeApp.getAppContext()
                 );
 
-                dishesRecycler.setLayoutManager(mLayoutManager);
-                final LinearLayoutManager layoutManager = (LinearLayoutManager) dishesRecycler.getLayoutManager();
+                categoryRecycler.setLayoutManager(mLayoutManager);
+                final LinearLayoutManager layoutManager = (LinearLayoutManager) categoryRecycler.getLayoutManager();
 
-//                categoryRecycler.addItemDecoration(
-//                        new RecycleViewItemDecoration(
-//                                CookingTimeApp.getAppContext(),
-//                                LinearLayoutManager.VERTICAL
-//                        )
-//                );
-                dishesRecycler.setAdapter(dishAdapter);
+                categoryRecycler.addItemDecoration(
+                        new RecycleViewItemDecoration(
+                                CookingTimeApp.getAppContext(),
+                                LinearLayoutManager.VERTICAL
+                        )
+                );
+                categoryRecycler.setAdapter(ingredientsAdapter);
 
-                dishesRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                categoryRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
                         int lastShowPost = layoutManager.findLastVisibleItemPosition();
 
-                        if ((lastShowPost + 1) == (DISHES_LIMIT * SearchNameFragment.this.page) && SearchNameFragment.this.nextPage != SearchNameFragment.this.page) {
+                        if ((lastShowPost + 1) == (INGREDIENTS_LIMIT * SearchIngredientsFragment.this.page) && SearchIngredientsFragment.this.nextPage != SearchIngredientsFragment.this.page) {
                             page++;
-                            getDishes();
+                            getIngredients();
                         }
 
                     }
                 });
-                dishesRecycler.addOnItemTouchListener(
+
+                categoryRecycler.addOnItemTouchListener(
                         new RecyclerViewTouchListener(
                                 CookingTimeApp.getAppContext(),
-                                dishesRecycler,
+                                categoryRecycler,
                                 new RecyclerViewTouchListener.ClickListener() {
                                     @Override
                                     public void onClick(View view, int position) {
-                                        requestListener.startDish(dishAdapter.getDish(position));
+
                                     }
 
                                     @Override
@@ -190,36 +186,36 @@ public class SearchNameFragment extends BaseFragment {
         }
     }
 
-    private void getDishes() {
-        getCalls().getAllDish(page, value).enqueue(new Callback<BaseArrayModel<Dish>>() {
+    private void getIngredients() {
+        getCalls().getAllIngredients(page).enqueue(new Callback<BaseArrayModel<Ingredients>>() {
             @Override
-            public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
+            public void onResponse(Call<BaseArrayModel<Ingredients>> call, Response<BaseArrayModel<Ingredients>> response) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         swipeToRefreshLayout.refreshComplete();
                     }
                 });
-                BaseArrayModel<Dish> dishes = response.body();
-                if (dishes != null) {
-                    if (!dishes.getData().isEmpty()) {
+                BaseArrayModel<Ingredients> ingredients = response.body();
+                if (ingredients != null) {
+                    if (!ingredients.getData().isEmpty()) {
                         if (page == 1) {
-                            cacheManager.putOrUpdateCache(TAG, dishes.getData());
+                            cacheManager.putOrUpdateCache(TAG, ingredients.getData());
                         } else {
-                            List<Dish> federal = (List<Dish>) cacheManager.getObjectFromCache(TAG);
-                            federal.addAll(dishes.getData());
+                            List<Ingredients> federal = (List<Ingredients>) cacheManager.getObjectFromCache(TAG);
+                            federal.addAll(ingredients.getData());
                             cacheManager.putOrUpdateCache(TAG, federal);
                         }
-                        initRecyclerView(dishes.getData());
+                        initRecyclerView(ingredients.getData());
                     } else {
-                        cacheManager.putOrUpdateCache(TAG, dishes.getData());
+                        cacheManager.putOrUpdateCache(TAG, ingredients.getData());
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<BaseArrayModel<Dish>> call, Throwable t) {
-                Log.d(TAG, "onFailure: ");
+            public void onFailure(Call<BaseArrayModel<Ingredients>> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -237,33 +233,7 @@ public class SearchNameFragment extends BaseFragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sortByName:
-                value = NAME;
-                getDishes();
-                return true;
-            case R.id.sortByCalories:
-                value = CALORIES;
-                getDishes();
-                return true;
-            case R.id.sortByCooking_time:
-                value = COOCKING_TIME;
-                getDishes();
-                return true;
-            case R.id.sortByDifficulty_level:
-                value = DIFFICULTY_LEVEL;
-                getDishes();
-                return true;
-            default:
-                break;
-        }
-        return false;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
     }
 }

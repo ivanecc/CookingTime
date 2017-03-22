@@ -2,6 +2,7 @@ package com.anna.cookingtime.activities;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,6 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.fragments.SearchCategoriesFragment;
+import com.anna.cookingtime.fragments.SearchDishFragment;
+import com.anna.cookingtime.fragments.SearchIngredientsFragment;
 import com.anna.cookingtime.fragments.SearchNameFragment;
 import com.anna.cookingtime.fragments.dish.DishFragment;
 import com.anna.cookingtime.interfaces.FragmentRequestListener;
@@ -64,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 drawerLayout.closeDrawers();
+                getSupportFragmentManager().popBackStack(
+                        null,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                );
                 switch (item.getItemId()) {
                     case R.id.navName:
                         setHideNamePoint();
@@ -71,10 +79,11 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                         return true;
                     case R.id.navIngredients:
                         setHideIngredPoint();
-
+                        startSearchIngredientsFragment();
                         return true;
                     case R.id.navGroup:
                         setHideGroupPoint();
+                        startSearchCategoriesFragment();
                         return true;
                 }
                 return true;
@@ -129,9 +138,29 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
     public void startSearchNameFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.content,
+                .replace(R.id.content,
                         new SearchNameFragment(),
                         SearchNameFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void startSearchCategoriesFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content,
+                        new SearchCategoriesFragment(),
+                        SearchCategoriesFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void startSearchIngredientsFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content,
+                        new SearchIngredientsFragment(),
+                        SearchIngredientsFragment.TAG)
                 .commit();
     }
 
@@ -146,4 +175,13 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                 .commit();
     }
 
+    @Override
+    public void startSearchDishFragment(int type, long idCategory) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content,
+                        SearchDishFragment.newInstance(type, idCategory))
+                .addToBackStack(SearchDishFragment.TAG)
+                .commit();
+    }
 }

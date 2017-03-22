@@ -7,8 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,6 +16,7 @@ import com.anna.cookingtime.adapters.DishRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
 import com.anna.cookingtime.models.Dish;
+import com.anna.cookingtime.utils.Constants;
 
 import java.util.List;
 
@@ -35,14 +34,11 @@ import retrofit2.Response;
  * Created by iva on 18.02.17.
  */
 
-public class SearchNameFragment extends BaseFragment {
-    public static final String TAG = "SearchName";
+public class SearchDishFragment extends BaseFragment {
+    public static final String TAG = "SearchDish";
     private static final byte DISHES_LIMIT = 15;
-
-    private final String DIFFICULTY_LEVEL = "difficulty_level";
-    private final String NAME = "name";
-    private final String COOCKING_TIME = "cooking_time";
-    private final String CALORIES = "calories";
+    private static final String TYPE = "type";
+    private static final String ID = "id";
 
     @BindView(R.id.dishesRecycler)
     RecyclerView dishesRecycler;
@@ -53,7 +49,20 @@ public class SearchNameFragment extends BaseFragment {
     private byte page = 1;
     private byte nextPage = 1;
     private DishRecyclerViewAdapter dishAdapter;
-    private String value = NAME;
+    private Call apiCall;
+    private long value;
+    private String cacheKey;
+
+    public static SearchDishFragment newInstance(int type, long categotyId) {
+
+        Bundle args = new Bundle();
+
+        SearchDishFragment fragment = new SearchDishFragment();
+        args.putInt(TYPE, type);
+        args.putLong(ID, categotyId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -76,7 +85,17 @@ public class SearchNameFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        List<Dish> dishList = (List<Dish>) cacheManager.getObjectFromCache(TAG);
+        value = getArguments().getLong(ID);
+        switch (getArguments().getInt(TYPE)) {
+            case Constants.CATEGORIES_TYPE:
+                apiCall = getCalls().getDishByCategories(page, value);
+                cacheKey = TAG + Constants.CATEGORIES_TYPE + value;
+                dishList = (List<Dish>) cacheManager.getObjectFromCache(cacheKey);
+                break;
+            case Constants.INGREDIENTS_TYPE:
+                break;
+        }
+
         if (dishList != null) {
             initRecyclerView(dishList);
         }
@@ -84,7 +103,7 @@ public class SearchNameFragment extends BaseFragment {
         initSwipeToRefresh();
 
 
-        if (!cacheManager.getRefreshFragmentMap().containsKey(TAG)) {
+        if (!cacheManager.getRefreshFragmentMap().containsKey(cacheKey)) {
             swipeToRefreshLayout.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -157,7 +176,7 @@ public class SearchNameFragment extends BaseFragment {
                         super.onScrolled(recyclerView, dx, dy);
                         int lastShowPost = layoutManager.findLastVisibleItemPosition();
 
-                        if ((lastShowPost + 1) == (DISHES_LIMIT * SearchNameFragment.this.page) && SearchNameFragment.this.nextPage != SearchNameFragment.this.page) {
+                        if ((lastShowPost + 1) == (DISHES_LIMIT * SearchDishFragment.this.page) && SearchDishFragment.this.nextPage != SearchDishFragment.this.page) {
                             page++;
                             getDishes();
                         }
@@ -191,7 +210,10 @@ public class SearchNameFragment extends BaseFragment {
     }
 
     private void getDishes() {
-        getCalls().getAllDish(page, value).enqueue(new Callback<BaseArrayModel<Dish>>() {
+        if (apiCall.isExecuted()) {
+            apiCall = apiCall.clone();
+        }
+        apiCall.enqueue(new Callback<BaseArrayModel<Dish>>() {
             @Override
             public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -204,15 +226,15 @@ public class SearchNameFragment extends BaseFragment {
                 if (dishes != null) {
                     if (!dishes.getData().isEmpty()) {
                         if (page == 1) {
-                            cacheManager.putOrUpdateCache(TAG, dishes.getData());
+                            cacheManager.putOrUpdateCache(cacheKey, dishes.getData());
                         } else {
-                            List<Dish> federal = (List<Dish>) cacheManager.getObjectFromCache(TAG);
+                            List<Dish> federal = (List<Dish>) cacheManager.getObjectFromCache(cacheKey);
                             federal.addAll(dishes.getData());
-                            cacheManager.putOrUpdateCache(TAG, federal);
+                            cacheManager.putOrUpdateCache(cacheKey, federal);
                         }
                         initRecyclerView(dishes.getData());
                     } else {
-                        cacheManager.putOrUpdateCache(TAG, dishes.getData());
+                        cacheManager.putOrUpdateCache(cacheKey, dishes.getData());
                     }
                 }
             }
@@ -237,33 +259,7 @@ public class SearchNameFragment extends BaseFragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sortByName:
-                value = NAME;
-                getDishes();
-                return true;
-            case R.id.sortByCalories:
-                value = CALORIES;
-                getDishes();
-                return true;
-            case R.id.sortByCooking_time:
-                value = COOCKING_TIME;
-                getDishes();
-                return true;
-            case R.id.sortByDifficulty_level:
-                value = DIFFICULTY_LEVEL;
-                getDishes();
-                return true;
-            default:
-                break;
-        }
-        return false;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
     }
 }

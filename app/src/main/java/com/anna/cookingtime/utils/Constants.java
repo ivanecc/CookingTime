@@ -13,4 +13,6 @@ public class Constants {
     public static final int RECIPE = 0;
     public static final int INGREDIENTS = 1;
     public static final String DISH_ID = "dish_id";
+    public static final int CATEGORIES_TYPE = 1;
+    public static final int INGREDIENTS_TYPE = 2;
 }

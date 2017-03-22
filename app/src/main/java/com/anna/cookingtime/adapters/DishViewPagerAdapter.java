@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import com.anna.cookingtime.fragments.dish.IngredientsFragment;
 import com.anna.cookingtime.fragments.dish.RecipeFragment;
 import com.anna.cookingtime.utils.Constants;
-import com.anna.cookingtime.utils.Utils;
 
 /**
  * Created by iva on 17.03.17.

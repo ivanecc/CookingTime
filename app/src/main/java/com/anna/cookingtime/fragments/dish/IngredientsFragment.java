@@ -73,7 +73,7 @@ public class IngredientsFragment extends BaseFragment implements DishFragment.Re
             if (ingredientsAdapter != null && recyclerIngredients.getAdapter() != null) {
                 ingredientsAdapter.setNewData(ingredientsList);
             } else {
-                ingredientsAdapter = new IngredientsRecyclerViewAdapter(ingredientsList);
+                ingredientsAdapter = new IngredientsRecyclerViewAdapter(ingredientsList, null);
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(
                         CookingTimeApp.getAppContext()
                 );
