@@ -16,8 +16,10 @@ import com.anna.cookingtime.adapters.DishRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
 import com.anna.cookingtime.models.Dish;
+import com.anna.cookingtime.models.Ingredients;
 import com.anna.cookingtime.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,6 +41,8 @@ public class SearchDishFragment extends BaseFragment {
     private static final byte DISHES_LIMIT = 15;
     private static final String TYPE = "type";
     private static final String ID = "id";
+    private static final String NAME = "name";
+    private static final String INGREDIENTS_ARRAY = "ingredients_array";
 
     @BindView(R.id.dishesRecycler)
     RecyclerView dishesRecycler;
@@ -50,16 +54,27 @@ public class SearchDishFragment extends BaseFragment {
     private byte nextPage = 1;
     private DishRecyclerViewAdapter dishAdapter;
     private Call apiCall;
-    private long value;
     private String cacheKey;
 
-    public static SearchDishFragment newInstance(int type, long categotyId) {
+    public static SearchDishFragment newInstance(int type, long categotyId, String name) {
 
         Bundle args = new Bundle();
 
         SearchDishFragment fragment = new SearchDishFragment();
         args.putInt(TYPE, type);
         args.putLong(ID, categotyId);
+        args.putString(NAME, name);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static SearchDishFragment newInstance(int type, ArrayList<Integer> arrayList) {
+
+        Bundle args = new Bundle();
+
+        SearchDishFragment fragment = new SearchDishFragment();
+        args.putInt(TYPE, type);
+        args.putIntegerArrayList(INGREDIENTS_ARRAY, arrayList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,14 +100,18 @@ public class SearchDishFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        value = getArguments().getLong(ID);
+        getActivity().setTitle(getArguments().getString(NAME));
         switch (getArguments().getInt(TYPE)) {
             case Constants.CATEGORIES_TYPE:
+                long value = getArguments().getLong(ID);
                 apiCall = getCalls().getDishByCategories(page, value);
                 cacheKey = TAG + Constants.CATEGORIES_TYPE + value;
                 dishList = (List<Dish>) cacheManager.getObjectFromCache(cacheKey);
                 break;
             case Constants.INGREDIENTS_TYPE:
+                ArrayList<Integer> listID = getArguments().getIntegerArrayList(INGREDIENTS_ARRAY);
+                apiCall = getCalls().getDishByIngredients(page, listID);
+                dishList = new ArrayList<>();
                 break;
         }
 

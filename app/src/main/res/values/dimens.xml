@@ -15,4 +15,5 @@
     <dimen name="sixteen_sp">16sp</dimen>
     <dimen name="two_dp">2dp</dimen>
     <dimen name="thirty_dp">30dp</dimen>
+    <dimen name="one_dp">1dp</dimen>
 </resources>

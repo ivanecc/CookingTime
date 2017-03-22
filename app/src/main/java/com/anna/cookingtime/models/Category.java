@@ -7,7 +7,7 @@ package com.anna.cookingtime.models;
 public class Category {
     private long id;
     private String name;
-    private String icon;
+    private String icon_name;
 
     public long getId() {
         return id;
@@ -26,10 +26,10 @@ public class Category {
     }
 
     public String getIcon() {
-        return icon;
+        return icon_name;
     }
 
     public void setIcon(String icon) {
-        this.icon = icon;
+        this.icon_name = icon;
     }
 }

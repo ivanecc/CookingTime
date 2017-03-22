@@ -155,7 +155,8 @@ public class SearchCategoriesFragment extends BaseFragment {
                                     public void onClick(View view, int position) {
                                         requestListener.startSearchDishFragment(
                                                 Constants.CATEGORIES_TYPE,
-                                                categoryAdapter.getCategory(position).getId());
+                                                categoryAdapter.getCategory(position).getId(),
+                                                categoryAdapter.getCategory(position).getName());
                                     }
 
                                     @Override

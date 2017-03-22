@@ -6,6 +6,7 @@ import com.anna.cookingtime.models.Category;
 import com.anna.cookingtime.models.Dish;
 import com.anna.cookingtime.models.Ingredients;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -20,6 +21,12 @@ public interface APICalls {
 
     @GET("dishes")
     Call<BaseArrayModel<Dish>> getDishByCategories(@Query("page") int page, @Query("by_category") long value);
+
+    @GET("dishes")
+    Call<BaseArrayModel<Dish>> searchDish(@Query("page") int page, @Query("by_name") String value);
+
+    @GET("dishes")
+    Call<BaseArrayModel<Dish>> getDishByIngredients(@Query("page") int page, @Query("by_ingredients[]") ArrayList<Integer> values);
 
     @GET("dishes/{dishId}")
     Call<Dish> getDish(@Path("dishId") long dishId);

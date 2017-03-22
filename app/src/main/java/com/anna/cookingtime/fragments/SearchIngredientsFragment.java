@@ -2,13 +2,18 @@ package com.anna.cookingtime.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
@@ -18,6 +23,7 @@ import com.anna.cookingtime.models.BaseArrayModel;
 import com.anna.cookingtime.models.CategoriesModel;
 import com.anna.cookingtime.models.Category;
 import com.anna.cookingtime.models.Ingredients;
+import com.anna.cookingtime.utils.Constants;
 import com.anna.cookingtime.views.RecycleViewItemDecoration;
 
 import java.util.ArrayList;
@@ -25,6 +31,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
@@ -45,6 +52,8 @@ public class SearchIngredientsFragment extends BaseFragment {
     RecyclerView categoryRecycler;
     @BindView(R.id.swipeToRefreshLayout)
     PtrFrameLayout swipeToRefreshLayout;
+    @BindView(R.id.findButton)
+    Button findButton;
 
     private List<Ingredients> ingredientsList;
     private byte page = 1;
@@ -64,6 +73,8 @@ public class SearchIngredientsFragment extends BaseFragment {
         });
 
         ButterKnife.bind(this, root);
+
+        findButton.setVisibility(View.VISIBLE);
 
         return root;
     }
@@ -129,7 +140,7 @@ public class SearchIngredientsFragment extends BaseFragment {
             } else {
                 ingredientsAdapter = new IngredientsRecyclerViewAdapter(
                         ingredientsList,
-                        new ArrayList<Long>()
+                        new ArrayList<Integer>()
                 );
                 LinearLayoutManager mLayoutManager = new LinearLayoutManager(
                         CookingTimeApp.getAppContext()
@@ -233,7 +244,32 @@ public class SearchIngredientsFragment extends BaseFragment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        menu.clear();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.search_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView.setQueryHint(getString(R.string.input_ingredient_name));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    @OnClick(R.id.findButton)
+    public void onClick() {
+        requestListener.startSearchDishFragment(
+                Constants.INGREDIENTS_TYPE,
+                ingredientsAdapter.getSelectedList()
+        );
     }
 }

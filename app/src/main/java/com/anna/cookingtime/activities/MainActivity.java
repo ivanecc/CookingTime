@@ -21,7 +21,10 @@ import com.anna.cookingtime.fragments.SearchIngredientsFragment;
 import com.anna.cookingtime.fragments.SearchNameFragment;
 import com.anna.cookingtime.fragments.dish.DishFragment;
 import com.anna.cookingtime.interfaces.FragmentRequestListener;
+import com.anna.cookingtime.models.Ingredients;
 import com.anna.cookingtime.utils.Utils;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -176,11 +179,21 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
     }
 
     @Override
-    public void startSearchDishFragment(int type, long idCategory) {
+    public void startSearchDishFragment(int type, long idCategory, String name) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.content,
-                        SearchDishFragment.newInstance(type, idCategory))
+                        SearchDishFragment.newInstance(type, idCategory, name))
+                .addToBackStack(SearchDishFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void startSearchDishFragment(int type, ArrayList<Integer> idList) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content,
+                        SearchDishFragment.newInstance(type, idList))
                 .addToBackStack(SearchDishFragment.TAG)
                 .commit();
     }

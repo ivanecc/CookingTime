@@ -2,8 +2,10 @@ package com.anna.cookingtime.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
@@ -194,12 +197,14 @@ public class SearchNameFragment extends BaseFragment {
         getCalls().getAllDish(page, value).enqueue(new Callback<BaseArrayModel<Dish>>() {
             @Override
             public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeToRefreshLayout.refreshComplete();
-                    }
-                });
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeToRefreshLayout.refreshComplete();
+                        }
+                    });
+                }
                 BaseArrayModel<Dish> dishes = response.body();
                 if (dishes != null) {
                     if (!dishes.getData().isEmpty()) {
@@ -240,18 +245,22 @@ public class SearchNameFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sortByName:
+                swipeToRefreshLayout.autoRefresh();
                 value = NAME;
                 getDishes();
                 return true;
             case R.id.sortByCalories:
+                swipeToRefreshLayout.autoRefresh();
                 value = CALORIES;
                 getDishes();
                 return true;
             case R.id.sortByCooking_time:
+                swipeToRefreshLayout.autoRefresh();
                 value = COOCKING_TIME;
                 getDishes();
                 return true;
             case R.id.sortByDifficulty_level:
+                swipeToRefreshLayout.autoRefresh();
                 value = DIFFICULTY_LEVEL;
                 getDishes();
                 return true;
@@ -262,8 +271,77 @@ public class SearchNameFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setQueryHint(getString(R.string.input_ingredient_name));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(final String query) {
+                page = 1;
+                swipeToRefreshLayout.autoRefresh();
+                getCalls().searchDish(page, query).enqueue(new Callback<BaseArrayModel<Dish>>() {
+                    @Override
+                    public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    swipeToRefreshLayout.refreshComplete();
+                                }
+                            });
+                        }
+                        BaseArrayModel<Dish> dishes = response.body();
+                        if (dishes != null) {
+                            if (!dishes.getData().isEmpty()) {
+                                initRecyclerView(dishes.getData());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseArrayModel<Dish>> call, Throwable t) {
+                        Log.d(TAG, "onFailure: ");
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeToRefreshLayout.refreshComplete();
+                            }
+                        });
+                    }
+                });
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                setItemsVisibility(menu, searchItem, false);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                setItemsVisibility(menu, searchItem, true);
+                swipeToRefreshLayout.autoRefresh();
+                getDishes();
+                return true;
+            }
+        });
+    }
+
+    private void setItemsVisibility(Menu menu, MenuItem exception, boolean visible) {
+        for (int i = 0; i < menu.size(); ++i) {
+            MenuItem item = menu.getItem(i);
+            if (item != exception) item.setVisible(visible);
+        }
     }
 }

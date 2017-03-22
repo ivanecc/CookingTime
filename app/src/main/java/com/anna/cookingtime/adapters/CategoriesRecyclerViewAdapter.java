@@ -46,8 +46,8 @@ public class CategoriesRecyclerViewAdapter
         final Category category = categoryList.get(position);
         Typeface iconFont = FontManager.getTypeface(CookingTimeApp.getAppContext(), FontManager.FONTAWESOME);
         holder.categoryPhoto.setTypeface(iconFont);
-        String ss = "\ue603";
-        holder.categoryPhoto.setText(ss);
+        long valLong = Long.parseLong(category.getIcon(), 16);
+        holder.categoryPhoto.setText((char) valLong + "");
         holder.categoryName.setText(category.getName());
     }
 

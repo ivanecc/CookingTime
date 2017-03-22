@@ -10,4 +10,6 @@
     <string name="easy">Easy</string>
     <string name="medium">Medium</string>
     <string name="hard">Hard</string>
+    <string name="input_ingredient_name">Input ingredient name</string>
+    <string name="find_dishes">Find Dishes</string>
 </resources>

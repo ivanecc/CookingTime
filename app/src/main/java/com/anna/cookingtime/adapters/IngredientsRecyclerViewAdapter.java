@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.anna.cookingtime.R;
@@ -23,11 +24,11 @@ import butterknife.ButterKnife;
 public class IngredientsRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final ArrayList<Long> selectIngredients;
+    private ArrayList<Integer> selectIngredients;
     private List<Ingredients> ingredientsList;
     private boolean isCheckBox;
 
-    public IngredientsRecyclerViewAdapter(List<Ingredients> ingredientsList, ArrayList<Long> selectIngredients) {
+    public IngredientsRecyclerViewAdapter(List<Ingredients> ingredientsList, ArrayList<Integer> selectIngredients) {
         this.ingredientsList = ingredientsList;
         if (selectIngredients == null) {
             this.isCheckBox = false;
@@ -50,7 +51,7 @@ public class IngredientsRecyclerViewAdapter
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         final Ingredients ingredient = ingredientsList.get(position);
         if (isCheckBox) {
             ((IngredientsCheckBoxHolder) holder).nameIngredient.setText(ingredient.getName());
@@ -59,13 +60,29 @@ public class IngredientsRecyclerViewAdapter
             } else {
                 ((IngredientsCheckBoxHolder) holder).checkboxIngredient.setChecked(false);
             }
-            ((IngredientsCheckBoxHolder) holder).checkboxIngredient.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            ((IngredientsCheckBoxHolder) holder).checkboxIngredient.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    CheckBox checkBox = (CheckBox) v;
+//                    if (checkBox.isChecked()) {
+//                        checkBox.setChecked(false);
+//                        selectIngredients.remove(ingredient.getId());
+//                    } else {
+//                        checkBox.setChecked(true);
+//                        selectIngredients.add(ingredient.getId());
+//                    }
+//                }
+//            });
+            ((IngredientsCheckBoxHolder) holder).checkBoxContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        selectIngredients.add(ingredient.getId());
-                    } else {
+                public void onClick(View v) {
+                    CheckBox checkBox = ((IngredientsCheckBoxHolder) holder).checkboxIngredient;
+                    if (checkBox.isChecked()) {
+                        checkBox.setChecked(false);
                         selectIngredients.remove(ingredient.getId());
+                    } else {
+                        checkBox.setChecked(true);
+                        selectIngredients.add((int) ingredient.getId());
                     }
                 }
             });
@@ -91,6 +108,10 @@ public class IngredientsRecyclerViewAdapter
         notifyDataSetChanged();
     }
 
+    public ArrayList<Integer> getSelectedList() {
+        return selectIngredients;
+    }
+
     class IngredientsHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.nameIngredient)
@@ -109,6 +130,8 @@ public class IngredientsRecyclerViewAdapter
 
     class IngredientsCheckBoxHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.checkBoxContainer)
+        RelativeLayout checkBoxContainer;
         @BindView(R.id.nameIngredient)
         TextView nameIngredient;
         @BindView(R.id.checkboxIngredient)
