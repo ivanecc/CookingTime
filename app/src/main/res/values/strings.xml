@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cooking Time</string>
+    <string name="app_name">EasyCooking</string>
     <string name="nav_ingredients">By ingredients</string>
     <string name="nav_name">By name</string>
     <string name="nav_group">By group</string>
