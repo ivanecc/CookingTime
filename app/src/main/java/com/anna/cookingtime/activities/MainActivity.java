@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.fragments.FavoritesFragment;
 import com.anna.cookingtime.fragments.SearchCategoriesFragment;
 import com.anna.cookingtime.fragments.SearchDishFragment;
 import com.anna.cookingtime.fragments.SearchIngredientsFragment;
@@ -22,6 +23,7 @@ import com.anna.cookingtime.fragments.SearchNameFragment;
 import com.anna.cookingtime.fragments.dish.DishFragment;
 import com.anna.cookingtime.interfaces.FragmentRequestListener;
 import com.anna.cookingtime.models.Ingredients;
+import com.anna.cookingtime.utils.CacheManager;
 import com.anna.cookingtime.utils.Utils;
 
 import java.util.ArrayList;
@@ -88,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
                         setHideGroupPoint();
                         startSearchCategoriesFragment();
                         return true;
+                    case R.id.navFavorite:
+                        setHideFavoritesPoint();
+                        startFavoritesFragment();
+                        return true;
                 }
                 return true;
             }
@@ -98,18 +104,28 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
         navigationView.getMenu().findItem(R.id.navGroup).setVisible(false);
         navigationView.getMenu().findItem(R.id.navIngredients).setVisible(true);
         navigationView.getMenu().findItem(R.id.navName).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navFavorite).setVisible(true);
     }
 
     private void setHideIngredPoint() {
         navigationView.getMenu().findItem(R.id.navIngredients).setVisible(false);
         navigationView.getMenu().findItem(R.id.navGroup).setVisible(true);
         navigationView.getMenu().findItem(R.id.navName).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navFavorite).setVisible(true);
     }
 
     private void setHideNamePoint() {
         navigationView.getMenu().findItem(R.id.navName).setVisible(false);
         navigationView.getMenu().findItem(R.id.navGroup).setVisible(true);
         navigationView.getMenu().findItem(R.id.navIngredients).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navFavorite).setVisible(true);
+    }
+
+    private void setHideFavoritesPoint() {
+        navigationView.getMenu().findItem(R.id.navName).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navGroup).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navIngredients).setVisible(true);
+        navigationView.getMenu().findItem(R.id.navFavorite).setVisible(false);
     }
 
     @Override
@@ -123,6 +139,11 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
             return actionBarDrawerToggle.onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        super.setTitle(title);
     }
 
     @Override
@@ -171,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
     public void startDish(long id) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.content,
+                .replace(R.id.content,
                         DishFragment.newInstance(id),
                         DishFragment.TAG)
                 .addToBackStack(DishFragment.TAG)
@@ -182,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
     public void startSearchDishFragment(int type, long idCategory, String name) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.content,
+                .replace(R.id.content,
                         SearchDishFragment.newInstance(type, idCategory, name))
                 .addToBackStack(SearchDishFragment.TAG)
                 .commit();
@@ -192,9 +213,25 @@ public class MainActivity extends AppCompatActivity implements FragmentRequestLi
     public void startSearchDishFragment(int type, ArrayList<Integer> idList) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.content,
+                .replace(R.id.content,
                         SearchDishFragment.newInstance(type, idList))
                 .addToBackStack(SearchDishFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        CacheManager.getInstance().saveFavoritesMapOnDeviceStorage();
+    }
+
+    @Override
+    public void startFavoritesFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content,
+                        new FavoritesFragment())
+                .addToBackStack(FavoritesFragment.TAG)
                 .commit();
     }
 }

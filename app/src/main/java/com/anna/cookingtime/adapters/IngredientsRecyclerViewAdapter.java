@@ -55,7 +55,7 @@ public class IngredientsRecyclerViewAdapter
         final Ingredients ingredient = ingredientsList.get(position);
         if (isCheckBox) {
             ((IngredientsCheckBoxHolder) holder).nameIngredient.setText(ingredient.getName());
-            if (selectIngredients.contains(ingredient.getId())) {
+            if (selectIngredients.contains(new Integer(ingredient.getId()))) {
                 ((IngredientsCheckBoxHolder) holder).checkboxIngredient.setChecked(true);
             } else {
                 ((IngredientsCheckBoxHolder) holder).checkboxIngredient.setChecked(false);
@@ -79,10 +79,10 @@ public class IngredientsRecyclerViewAdapter
                     CheckBox checkBox = ((IngredientsCheckBoxHolder) holder).checkboxIngredient;
                     if (checkBox.isChecked()) {
                         checkBox.setChecked(false);
-                        selectIngredients.remove(ingredient.getId());
+                        selectIngredients.remove(new Integer(ingredient.getId()));
                     } else {
                         checkBox.setChecked(true);
-                        selectIngredients.add((int) ingredient.getId());
+                        selectIngredients.add(new Integer(ingredient.getId()));
                     }
                 }
             });
@@ -103,13 +103,19 @@ public class IngredientsRecyclerViewAdapter
         return ingredientsList.size();
     }
 
-    public void setNewData(List<Ingredients> ingredientsList) {
+    public void setNewData(List<Ingredients> ingredientsList, ArrayList<Integer> selectedIngredients) {
+
         this.ingredientsList = ingredientsList;
         notifyDataSetChanged();
     }
 
     public ArrayList<Integer> getSelectedList() {
         return selectIngredients;
+    }
+
+    public void addData(List<Ingredients> ingredientsList) {
+        this.ingredientsList.addAll(ingredientsList);
+        notifyDataSetChanged();
     }
 
     class IngredientsHolder extends RecyclerView.ViewHolder {

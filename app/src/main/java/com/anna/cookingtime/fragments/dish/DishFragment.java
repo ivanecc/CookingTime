@@ -7,12 +7,15 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.activities.MainActivity;
 import com.anna.cookingtime.adapters.DishViewPagerAdapter;
 import com.anna.cookingtime.fragments.BaseFragment;
 import com.anna.cookingtime.models.Dish;
@@ -56,6 +59,7 @@ public class DishFragment extends BaseFragment {
 
     private long idDish;
     private RefreshData detailsListener, ingredientsListener;
+    private Menu mainMenu;
 
     public static DishFragment newInstance(long id) {
 
@@ -139,23 +143,45 @@ public class DishFragment extends BaseFragment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
+        inflater.inflate(R.menu.favorite_menu, menu);
+        mainMenu = menu;
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem favoriteItem = menu.findItem(R.id.action_favorite);
+        favoriteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (cacheManager.isFavorite(TAG + idDish)) {
+                    cacheManager.addFavorite(TAG + idDish, null);
+                    item.setIcon(getResources().getDrawable(R.drawable.ic_favorite, null));
+                } else {
+                    cacheManager.addFavorite(TAG + idDish, dish);
+                    item.setIcon(getResources().getDrawable(R.drawable.ic_favorite_select, null));
+                }
+                return true;
+            }
+        });
+
     }
 
-    private void getDish(long id) {
+    private void getDish(final long id) {
         getCalls().getDish(id).enqueue(new Callback<Dish>() {
             @Override
             public void onResponse(Call<Dish> call, Response<Dish> response) {
                 DishFragment.this.dish = response.body();
                 if (dish != null) {
-                    getActivity().setTitle(dish.getName());
+                    ((MainActivity) getActivity()).getSupportActionBar()
+                            .setTitle(dish.getName());
                     detailsListener.onRefresh(dish);
                     ingredientsListener.onRefresh(dish);
                     dishPhoto.loadImage(dish.getImageUrl(), dishProgressBar);
                     dishCalories.setText(String.valueOf(dish.getCalories()));
                     dishTime.setText(String.valueOf(dish.getCookingTime()));
                     setDifficultyLevel(dish);
+                    if (cacheManager.isFavorite(TAG + idDish)) {
+                        mainMenu.findItem(R.id.action_favorite).setIcon(getResources().getDrawable(R.drawable.ic_favorite_select, null));
+                    }
                     cacheManager.putOrUpdateCache(TAG + idDish, dish);
                 }
             }

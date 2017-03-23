@@ -37,4 +37,7 @@ public interface APICalls {
     @GET("ingredients")
     Call<BaseArrayModel<Ingredients>> getAllIngredients(@Query("page") int page);
 
+    @GET("ingredients")
+    Call<BaseArrayModel<Ingredients>> searchIngredient(@Query("page") int page, @Query("by_name") String value);
+
 }

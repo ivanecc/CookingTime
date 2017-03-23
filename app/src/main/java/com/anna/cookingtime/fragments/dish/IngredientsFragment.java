@@ -71,7 +71,7 @@ public class IngredientsFragment extends BaseFragment implements DishFragment.Re
     private void initRecyclerView(List<Ingredients> ingredientsList) {
         if (ingredientsList != null) {
             if (ingredientsAdapter != null && recyclerIngredients.getAdapter() != null) {
-                ingredientsAdapter.setNewData(ingredientsList);
+                ingredientsAdapter.setNewData(ingredientsList, null);
             } else {
                 ingredientsAdapter = new IngredientsRecyclerViewAdapter(ingredientsList, null);
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(

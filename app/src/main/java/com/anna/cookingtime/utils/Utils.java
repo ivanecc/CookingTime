@@ -11,6 +11,7 @@ public class Utils {
     private static User user;
 
     private static boolean isRootFragment = true;
+    private static String currentDishTitle;
 
     public static void setUser(User u) {
         user = u;
@@ -26,5 +27,13 @@ public class Utils {
 
     public static void setRootFragment(boolean rootFragment) {
         isRootFragment = rootFragment;
+    }
+
+    public static void setCurrentDishTitle(String currentDishTitle) {
+        Utils.currentDishTitle = currentDishTitle;
+    }
+
+    public static String getCurrentDishTitle() {
+        return currentDishTitle;
     }
 }

@@ -6,16 +6,16 @@ import java.io.Serializable;
  * Created by iva on 21.02.17.
  */
 public class Ingredients implements Serializable{
-    private long id;
+    private int id;
     private String name;
     private float quantity;
     private String unit;
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

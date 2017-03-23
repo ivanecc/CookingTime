@@ -16,6 +16,7 @@ public class Dish implements Serializable {
     private int cookingTime;
     private int calories;
     private List<Ingredients> ingredients;
+    private transient boolean isFavorite;
 
     public long getId() {
         return id;
@@ -79,5 +80,13 @@ public class Dish implements Serializable {
 
     public void setCalories(int calories) {
         this.calories = calories;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 }

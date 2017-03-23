@@ -1,11 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-                <item
-                    android:id="@+id/navIngredients"
-                    android:title="@string/nav_ingredients" />
-                <item
-                    android:id="@+id/navName"
-                    android:title="@string/nav_name" />
-                <item
-                    android:id="@+id/navGroup"
-                    android:title="@string/nav_group" />
+    <item
+        android:id="@+id/navIngredients"
+        android:title="@string/nav_ingredients" />
+    <item
+        android:id="@+id/navName"
+        android:title="@string/nav_name" />
+    <item
+        android:id="@+id/navGroup"
+        android:title="@string/nav_group" />
+    <item
+        android:id="@+id/navFavorite"
+        android:title="@string/nav_favorite" />
 </menu>

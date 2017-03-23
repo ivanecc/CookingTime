@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.activities.MainActivity;
 import com.anna.cookingtime.adapters.CategoriesRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
@@ -63,6 +64,8 @@ public class SearchCategoriesFragment extends BaseFragment {
         });
 
         ButterKnife.bind(this, root);
+
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.categories_toolbar));
 
         return root;
     }

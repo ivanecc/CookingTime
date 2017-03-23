@@ -13,4 +13,5 @@ public interface FragmentRequestListener {
     void startSearchCategoriesFragment();
     void startSearchIngredientsFragment();
     void startDish(long id);
+    void startFavoritesFragment();
 }

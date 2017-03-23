@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.activities.MainActivity;
 import com.anna.cookingtime.adapters.DishRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
@@ -54,9 +55,11 @@ public class SearchNameFragment extends BaseFragment {
 
     private List<Dish> dishList;
     private byte page = 1;
-    private byte nextPage = 1;
+    private int nextPage = 1;
     private DishRecyclerViewAdapter dishAdapter;
     private String value = NAME;
+    private boolean isSearch = false;
+    private String searchQuery = "";
 
     @Nullable
     @Override
@@ -78,7 +81,7 @@ public class SearchNameFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.dishes_toolbar));
         List<Dish> dishList = (List<Dish>) cacheManager.getObjectFromCache(TAG);
         if (dishList != null) {
             initRecyclerView(dishList);
@@ -123,7 +126,12 @@ public class SearchNameFragment extends BaseFragment {
 
             @Override
             public void onRefreshBegin(final PtrFrameLayout frame) {
-                getDishes();
+                page = 1;
+                if (isSearch) {
+                    searchDish();
+                } else {
+                    getDishes();
+                }
             }
         });
     }
@@ -132,7 +140,11 @@ public class SearchNameFragment extends BaseFragment {
         if (dishList != null) {
             this.dishList = dishList;
             if (dishAdapter != null && dishesRecycler.getAdapter() != null) {
-                dishAdapter.setNewData(dishList);
+                if (SearchNameFragment.this.page != 1) {
+                    dishAdapter.addData(dishList);
+                } else {
+                    dishAdapter.setNewData(dishList);
+                }
             } else {
                 dishAdapter = new DishRecyclerViewAdapter(
                         dishList,
@@ -208,6 +220,7 @@ public class SearchNameFragment extends BaseFragment {
                 BaseArrayModel<Dish> dishes = response.body();
                 if (dishes != null) {
                     if (!dishes.getData().isEmpty()) {
+                        SearchNameFragment.this.nextPage = dishes.getNextPage();
                         if (page == 1) {
                             cacheManager.putOrUpdateCache(TAG, dishes.getData());
                         } else {
@@ -218,6 +231,40 @@ public class SearchNameFragment extends BaseFragment {
                         initRecyclerView(dishes.getData());
                     } else {
                         cacheManager.putOrUpdateCache(TAG, dishes.getData());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseArrayModel<Dish>> call, Throwable t) {
+                Log.d(TAG, "onFailure: ");
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeToRefreshLayout.refreshComplete();
+                    }
+                });
+            }
+        });
+    }
+
+    private void searchDish() {
+        getCalls().searchDish(page, searchQuery).enqueue(new Callback<BaseArrayModel<Dish>>() {
+            @Override
+            public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeToRefreshLayout.refreshComplete();
+                        }
+                    });
+                }
+                BaseArrayModel<Dish> dishes = response.body();
+                if (dishes != null) {
+                    SearchNameFragment.this.nextPage = dishes.getNextPage();
+                    if (!dishes.getData().isEmpty()) {
+                        initRecyclerView(dishes.getData());
                     }
                 }
             }
@@ -272,47 +319,19 @@ public class SearchNameFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.main_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setQueryHint(getString(R.string.input_ingredient_name));
+        searchView.setQueryHint(getString(R.string.input_dish_name));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(final String query) {
                 page = 1;
+                searchQuery = query;
                 swipeToRefreshLayout.autoRefresh();
-                getCalls().searchDish(page, query).enqueue(new Callback<BaseArrayModel<Dish>>() {
-                    @Override
-                    public void onResponse(Call<BaseArrayModel<Dish>> call, Response<BaseArrayModel<Dish>> response) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    swipeToRefreshLayout.refreshComplete();
-                                }
-                            });
-                        }
-                        BaseArrayModel<Dish> dishes = response.body();
-                        if (dishes != null) {
-                            if (!dishes.getData().isEmpty()) {
-                                initRecyclerView(dishes.getData());
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<BaseArrayModel<Dish>> call, Throwable t) {
-                        Log.d(TAG, "onFailure: ");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                swipeToRefreshLayout.refreshComplete();
-                            }
-                        });
-                    }
-                });
                 return false;
             }
 
@@ -325,14 +344,15 @@ public class SearchNameFragment extends BaseFragment {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 setItemsVisibility(menu, searchItem, false);
+                isSearch = true;
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 setItemsVisibility(menu, searchItem, true);
+                isSearch = false;
                 swipeToRefreshLayout.autoRefresh();
-                getDishes();
                 return true;
             }
         });

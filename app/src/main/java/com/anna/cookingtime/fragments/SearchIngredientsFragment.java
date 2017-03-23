@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.activities.MainActivity;
 import com.anna.cookingtime.adapters.IngredientsRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
@@ -46,7 +48,7 @@ import retrofit2.Response;
 
 public class SearchIngredientsFragment extends BaseFragment {
     public static final String TAG = "SearchIngredients";
-    private static final byte INGREDIENTS_LIMIT = 15;
+    private static final byte INGREDIENTS_LIMIT = 25;
 
     @BindView(R.id.dishesRecycler)
     RecyclerView categoryRecycler;
@@ -57,8 +59,11 @@ public class SearchIngredientsFragment extends BaseFragment {
 
     private List<Ingredients> ingredientsList;
     private byte page = 1;
-    private byte nextPage = 1;
+    private int nextPage = 1;
     private IngredientsRecyclerViewAdapter ingredientsAdapter;
+    private String searchQuery = "";
+    private boolean isSearch = false;
+    private ArrayList<Integer> selectedIngredients;
 
     @Nullable
     @Override
@@ -75,6 +80,8 @@ public class SearchIngredientsFragment extends BaseFragment {
         ButterKnife.bind(this, root);
 
         findButton.setVisibility(View.VISIBLE);
+
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.ingredients_toolbar));
 
         return root;
     }
@@ -127,7 +134,12 @@ public class SearchIngredientsFragment extends BaseFragment {
 
             @Override
             public void onRefreshBegin(final PtrFrameLayout frame) {
-                getIngredients();
+                page = 1;
+                if (isSearch) {
+                    searchIngredients();
+                } else {
+                    getIngredients();
+                }
             }
         });
     }
@@ -136,7 +148,11 @@ public class SearchIngredientsFragment extends BaseFragment {
         if (ingredientsList != null) {
             this.ingredientsList = ingredientsList;
             if (ingredientsAdapter != null && categoryRecycler.getAdapter() != null) {
-                ingredientsAdapter.setNewData(ingredientsList);
+                if (SearchIngredientsFragment.this.page != 1) {
+                    ingredientsAdapter.addData(ingredientsList);
+                } else {
+                    ingredientsAdapter.setNewData(ingredientsList, selectedIngredients);
+                }
             } else {
                 ingredientsAdapter = new IngredientsRecyclerViewAdapter(
                         ingredientsList,
@@ -209,6 +225,7 @@ public class SearchIngredientsFragment extends BaseFragment {
                 });
                 BaseArrayModel<Ingredients> ingredients = response.body();
                 if (ingredients != null) {
+                    SearchIngredientsFragment.this.nextPage = ingredients.getNextPage();
                     if (!ingredients.getData().isEmpty()) {
                         if (page == 1) {
                             cacheManager.putOrUpdateCache(TAG, ingredients.getData());
@@ -237,6 +254,40 @@ public class SearchIngredientsFragment extends BaseFragment {
         });
     }
 
+    private void searchIngredients() {
+        selectedIngredients = ingredientsAdapter.getSelectedList();
+        getCalls().searchIngredient(page, searchQuery).enqueue(new Callback<BaseArrayModel<Ingredients>>() {
+            @Override
+            public void onResponse(Call<BaseArrayModel<Ingredients>> call, Response<BaseArrayModel<Ingredients>> response) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeToRefreshLayout.refreshComplete();
+                    }
+                });
+                BaseArrayModel<Ingredients> ingredients = response.body();
+                if (ingredients != null) {
+                    SearchIngredientsFragment.this.nextPage = ingredients.getNextPage();
+                    if (!ingredients.getData().isEmpty()) {
+                        initRecyclerView(ingredients.getData());
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseArrayModel<Ingredients>> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeToRefreshLayout.refreshComplete();
+                    }
+                });
+            }
+        });
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,22 +296,39 @@ public class SearchIngredientsFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.search_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint(getString(R.string.input_ingredient_name));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
+            public boolean onQueryTextSubmit(final String query) {
+                page = 1;
+                searchQuery = query;
+                swipeToRefreshLayout.autoRefresh();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                isSearch = true;
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                isSearch = false;
+                swipeToRefreshLayout.autoRefresh();
+                return true;
             }
         });
     }

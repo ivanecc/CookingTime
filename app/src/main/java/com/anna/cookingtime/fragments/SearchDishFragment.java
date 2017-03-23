@@ -12,12 +12,14 @@ import android.view.ViewGroup;
 
 import com.anna.cookingtime.CookingTimeApp;
 import com.anna.cookingtime.R;
+import com.anna.cookingtime.activities.MainActivity;
 import com.anna.cookingtime.adapters.DishRecyclerViewAdapter;
 import com.anna.cookingtime.interfaces.RecyclerViewTouchListener;
 import com.anna.cookingtime.models.BaseArrayModel;
 import com.anna.cookingtime.models.Dish;
 import com.anna.cookingtime.models.Ingredients;
 import com.anna.cookingtime.utils.Constants;
+import com.anna.cookingtime.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +53,7 @@ public class SearchDishFragment extends BaseFragment {
 
     private List<Dish> dishList;
     private byte page = 1;
-    private byte nextPage = 1;
+    private int nextPage = 1;
     private DishRecyclerViewAdapter dishAdapter;
     private Call apiCall;
     private String cacheKey;
@@ -99,8 +101,10 @@ public class SearchDishFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        getActivity().setTitle(getArguments().getString(NAME));
+        if (getArguments() != null) {
+            Utils.setCurrentDishTitle(getArguments().getString(NAME, getString(R.string.dishes_toolbar)));
+        }
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getArguments().getString(NAME, Utils.getCurrentDishTitle()));
         switch (getArguments().getInt(TYPE)) {
             case Constants.CATEGORIES_TYPE:
                 long value = getArguments().getLong(ID);
@@ -243,6 +247,7 @@ public class SearchDishFragment extends BaseFragment {
                 });
                 BaseArrayModel<Dish> dishes = response.body();
                 if (dishes != null) {
+                    SearchDishFragment.this.nextPage = dishes.getNextPage();
                     if (!dishes.getData().isEmpty()) {
                         if (page == 1) {
                             cacheManager.putOrUpdateCache(cacheKey, dishes.getData());

@@ -68,6 +68,11 @@ public class DishRecyclerViewAdapter
         return dishList.get(position).getId();
     }
 
+    public void addData(List<Dish> dishList) {
+        this.dishList.addAll(dishList);
+        notifyDataSetChanged();
+    }
+
     public class PeopleHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.dishPhoto)

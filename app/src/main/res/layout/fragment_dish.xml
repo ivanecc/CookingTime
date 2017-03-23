@@ -30,6 +30,7 @@
 
                 <com.anna.cookingtime.views.BetterImageView
                     android:id="@+id/dishPhoto"
+                    android:scaleType="centerCrop"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     tool:src="@mipmap/ic_launcher" />

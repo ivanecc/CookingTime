@@ -12,4 +12,9 @@
     <string name="hard">Hard</string>
     <string name="input_ingredient_name">Input ingredient name</string>
     <string name="find_dishes">Find Dishes</string>
+    <string name="input_dish_name">Input dish name</string>
+    <string name="dishes_toolbar">Dishes</string>
+    <string name="ingredients_toolbar">Ingredients</string>
+    <string name="categories_toolbar">Categories</string>
+    <string name="nav_favorite">Favorite</string>
 </resources>
